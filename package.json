@@ -1,0 +1,21 @@
+{
+  "name": "airbnb-invoice-fetcher",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend",
+    "scraper"
+  ],
+  "scripts": {
+    "dev:backend": "npm --workspace=backend run dev",
+    "dev:scraper": "npm --workspace=scraper run dev",
+    "dev:frontend": "npm --workspace=frontend run dev",
+    "build:backend": "npm --workspace=backend run build",
+    "build:scraper": "npm --workspace=scraper run build",
+    "build:frontend": "npm --workspace=frontend run build"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
