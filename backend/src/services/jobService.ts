@@ -82,6 +82,44 @@ export async function createJob(userId: string, body: JobCreateBody) {
   return { ...job, status: 'queued', bullmq_job_id: bullJob.id };
 }
 
+export async function createTestJob(userId: string, accountId: string) {
+  const { data: account, error: accErr } = await supabaseAdmin
+    .from('airbnb_accounts')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('id', accountId)
+    .single();
+
+  if (accErr || !account) {
+    throw Object.assign(new Error('Account not found'), { statusCode: 404 });
+  }
+
+  const now = new Date();
+  const month = now.getMonth() + 1;
+  const year = now.getFullYear();
+
+  const { data: job, error } = await supabaseAdmin
+    .from('download_jobs')
+    .insert({ user_id: userId, account_id: accountId, month, year, status: 'queued' })
+    .select()
+    .single();
+
+  if (error) throw error;
+
+  const bullJob = await invoiceQueue.add(
+    'test-login',
+    { jobId: job.id, accountId, userId, month, year, test: true },
+    { jobId: `test-${job.id}` }
+  );
+
+  await supabaseAdmin
+    .from('download_jobs')
+    .update({ bullmq_job_id: bullJob.id })
+    .eq('id', job.id);
+
+  return { ...job, status: 'queued', bullmq_job_id: bullJob.id };
+}
+
 export async function cancelJob(userId: string, jobId: string) {
   const { data: job, error } = await supabaseAdmin
     .from('download_jobs')
