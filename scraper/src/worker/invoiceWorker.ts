@@ -87,6 +87,25 @@ export async function processInvoiceJob(data: InvoiceJobData): Promise<void> {
       await saveSession(page, accountId);
     }
 
+    // Test-login jobs stop here — they only verify credentials work
+    if (data.test) {
+      await updateJobStatus(jobId, 'completed', {
+        completed_at: new Date().toISOString(),
+        invoices_found: 0,
+        invoices_downloaded: 0,
+      });
+      await createNotification(
+        userId, jobId, 'job_completed',
+        'Login test passed',
+        `Account ${account.email} authenticated successfully.`
+      );
+      await supabaseAdmin
+        .from('airbnb_accounts')
+        .update({ status: 'active', last_error: null })
+        .eq('id', accountId);
+      return;
+    }
+
     // Navigate to invoices
     await withRetry(() => navigateToInvoices(page!, month, year));
 
@@ -137,6 +156,7 @@ export async function processInvoiceJob(data: InvoiceJobData): Promise<void> {
         downloadedCount++;
 
         await updateJobStatus(jobId, 'running', { invoices_downloaded: downloadedCount });
+        await randomDelay(2000, 5000);
       } catch (err) {
         console.error(`Failed to download invoice ${invoice.invoiceNumber}:`, err);
         await supabaseAdmin
@@ -199,4 +219,8 @@ export async function processInvoiceJob(data: InvoiceJobData): Promise<void> {
 
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function randomDelay(minMs: number, maxMs: number): Promise<void> {
+  return sleep(minMs + Math.random() * (maxMs - minMs));
 }

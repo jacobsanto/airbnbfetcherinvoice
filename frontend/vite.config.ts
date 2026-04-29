@@ -7,6 +7,18 @@ export default defineConfig({
   resolve: {
     alias: { '@': path.resolve(__dirname, './src') },
   },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-query': ['@tanstack/react-query'],
+          'vendor-supabase': ['@supabase/supabase-js'],
+          'vendor-ui': ['lucide-react', 'react-hot-toast', 'date-fns', 'clsx', 'tailwind-merge'],
+        },
+      },
+    },
+  },
   server: {
     port: 5173,
     proxy: {

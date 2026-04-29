@@ -2,7 +2,7 @@ import { FastifyInstance } from 'fastify';
 import { z } from 'zod';
 import { authenticate, getUserId } from '../middleware/auth';
 import * as accountService from '../services/accountService';
-import { invoiceQueue } from '../lib/queue';
+import * as jobService from '../services/jobService';
 
 const createSchema = z.object({
   label: z.string().min(1).max(100),
@@ -54,10 +54,7 @@ export async function accountsRoutes(fastify: FastifyInstance) {
   fastify.post('/:id/test', async (req, reply) => {
     const { id } = req.params as { id: string };
     const userId = getUserId(req);
-    const account = await accountService.getAccount(userId, id);
-    if (!account) return reply.status(404).send({ error: 'Account not found' });
-
-    await invoiceQueue.add('test-login', { accountId: id, userId, test: true });
-    return { message: 'Test login queued' };
+    const job = await jobService.createTestJob(userId, id);
+    return reply.status(201).send({ message: 'Test login queued', jobId: job.id });
   });
 }
