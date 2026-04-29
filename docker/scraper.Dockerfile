@@ -1,3 +1,19 @@
+# ---- Build stage ----
+FROM node:20-bullseye-slim AS builder
+
+WORKDIR /app
+
+COPY package.json ./
+COPY scraper/package*.json ./scraper/
+
+RUN npm install --workspace=scraper
+
+COPY scraper/src ./scraper/src
+COPY scraper/tsconfig.json ./scraper/
+
+RUN npm run build:scraper
+
+# ---- Production image ----
 FROM node:20-bullseye-slim
 
 # Install Chromium and required system dependencies
@@ -41,6 +57,6 @@ WORKDIR /app
 COPY scraper/package*.json ./
 RUN npm ci --omit=dev
 
-COPY scraper/dist ./dist
+COPY --from=builder /app/scraper/dist ./dist
 
 CMD ["node", "dist/index.js"]

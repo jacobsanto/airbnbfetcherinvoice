@@ -62,3 +62,15 @@ export interface Notification {
   metadata: Record<string, unknown> | null;
   created_at: string;
 }
+
+export interface Schedule {
+  id: string;
+  account_id: string;
+  enabled: boolean;
+  run_day: number;
+  last_run_at: string | null;
+  created_at: string;
+  updated_at: string;
+  airbnb_accounts?: { id: string; label: string; email: string };
+  last_job?: { id: string; status: string; invoices_downloaded: number } | null;
+}
