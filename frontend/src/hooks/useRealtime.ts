@@ -2,6 +2,7 @@ import { useEffect, useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/lib/supabaseClient';
 import { useAuth } from '@/context/AuthContext';
+import { DEMO_MODE } from '@/lib/demoMode';
 import { DownloadJob } from '@/types';
 
 export function useRealtimeJobs() {
@@ -9,7 +10,7 @@ export function useRealtimeJobs() {
   const { user } = useAuth();
 
   useEffect(() => {
-    if (!user) return;
+    if (DEMO_MODE || !user) return;
 
     const channel = supabase
       .channel('download_jobs_changes')
@@ -45,7 +46,7 @@ export function useRealtimeNotifications(onNew?: () => void) {
   const { user } = useAuth();
 
   useEffect(() => {
-    if (!user) return;
+    if (DEMO_MODE || !user) return;
 
     const channel = supabase
       .channel('notifications_changes')
@@ -74,7 +75,7 @@ export function useAwaitingTwoFA(onRequired?: (jobId: string) => void) {
   const { user } = useAuth();
 
   useEffect(() => {
-    if (!user) return;
+    if (DEMO_MODE || !user) return;
 
     const channel = supabase
       .channel('jobs_2fa_watch')

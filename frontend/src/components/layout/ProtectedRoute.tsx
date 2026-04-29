@@ -1,5 +1,6 @@
 import { Navigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { DEMO_MODE } from '@/lib/demoMode';
 
 export function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
@@ -12,6 +13,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!user) return <Navigate to="/login" replace />;
+  // In demo mode the user stub is always set — no login needed
+  if (!user && !DEMO_MODE) return <Navigate to="/login" replace />;
   return <>{children}</>;
 }
