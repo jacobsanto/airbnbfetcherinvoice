@@ -2,6 +2,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { LayoutDashboard, Users, Briefcase, FileText, Settings, LogOut } from 'lucide-react';
 import { useAuth } from '@/context/AuthContext';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
+import { DEMO_MODE } from '@/lib/demoMode';
 import { cn } from '@/lib/utils';
 
 const navItems = [
@@ -52,10 +53,18 @@ export function Layout({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="p-4 border-t border-gray-200">
-          <p className="text-xs text-gray-500 truncate mb-2">{user?.email}</p>
+          <div className="flex items-center gap-2 mb-2">
+            <p className="text-xs text-gray-500 truncate flex-1">{user?.email}</p>
+            {DEMO_MODE && (
+              <span className="text-xs bg-violet-100 text-violet-700 font-medium px-1.5 py-0.5 rounded shrink-0">
+                Demo
+              </span>
+            )}
+          </div>
           <button
             onClick={handleSignOut}
-            className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+            disabled={DEMO_MODE}
+            className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
           >
             <LogOut size={16} /> Sign out
           </button>

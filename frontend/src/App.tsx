@@ -6,6 +6,8 @@ import { ProtectedRoute } from '@/components/layout/ProtectedRoute';
 import { Layout } from '@/components/layout/Layout';
 import { OTPPrompt } from '@/components/auth/OTPPrompt';
 import { ErrorBoundary } from '@/components/ui/ErrorBoundary';
+import { DemoBanner } from '@/components/ui/DemoBanner';
+import { DEMO_MODE } from '@/lib/demoMode';
 import { LoginPage } from '@/pages/LoginPage';
 import { DashboardPage } from '@/pages/DashboardPage';
 import { AccountsPage } from '@/pages/AccountsPage';
@@ -27,6 +29,7 @@ const queryClient = new QueryClient({
 export default function App() {
   return (
     <ErrorBoundary>
+      {DEMO_MODE && <DemoBanner />}
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <BrowserRouter>
